@@ -1,2 +1,2 @@
 # Farebný hudobný zážitok
-## Jakub je kapitan
+## Jakub je kapitán

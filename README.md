@@ -1,2 +1,5 @@
 # Farebný hudobný zážitok
-## Jakub je kapitán
+Semestrálne zadanie z predmetu VRS\
+<b>Členovia:</b> Jakub Mihálik, Aleš Melichar, Michal Lúčny, Martin Berki
+
+---

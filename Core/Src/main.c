@@ -34,77 +34,12 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-#define MAX_LED 1
-#define USER_BRIGHTNESS 1
-#define PI 3.14159265
-#include <math.h>
-
-
-uint8_t LED_Data[MAX_LED][4];
-uint8_t LED_Mod[MAX_LED][4];
-
-int dataSendFlag = 1;
-
+int sendFlag = 0;
 void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 {
-	HAL_TIM_PWM_Stop_DMA(&htim2, TIM_CHANNEL_1);
-	dataSendFlag = 1;
+	HAL_TIM_PWM_Stop_DMA(&htim1, TIM_CHANNEL_1);
+	sendFlag = 1;
 }
-
-void setLed(int ledNum, int red, int green, int blue)
-{
-	LED_Data[ledNum][0] = ledNum;
-	LED_Data[ledNum][1] = green;
-	LED_Data[ledNum][2] = red;
-	LED_Data[ledNum][3] = blue;
-}
-
-void setBrightness(int brightness)
-{
-#if USER_BRIGHTNESS
-	if (brightness > 45) brightness = 45;
-	for (int i = 0; i < MAX_LED; i++)
-	{
-		LED_Mod[i][0] = LED_Data[i][0];
-		for (int j = 1; j < 4; j++)
-		{
-			/*float angle = 90 - brightness;
-			angle = angle * PI;
-			LED_Mod[i][j] = (LED_Data[i][j]) / tan(angle);*/
-			LED_Mod[i][j] = LED_Data[i][j];
-		}
-	}
-#endif
-}
-
-uint16_t pwmData[(24 * MAX_LED) + 50];
-
-void send(void)
-{
-	uint32_t index = 0;
-	uint32_t color = 0;
-
-	for (int i = 0; i < MAX_LED; i++)
-	{
-		color = ((LED_Mod[i][1] <<  16) | (LED_Mod[i][2] << 8) | (LED_Mod[i][3]));
-
-		for (int i = 23; i >= 0; i--)
-		{
-			if (color & (1 << i)) pwmData[index] = 60;
-			else pwmData[index] = 30;
-			index++;
-		}
-	}
-	for (int i = 0; i < 50; i++)
-	{
-		pwmData[index] = 0;
-		index++;
-	}
-	HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1, (uint32_t *) pwmData, index);
-	while(!dataSendFlag);
-	dataSendFlag = 0;
-}
-
 /* USER CODE END 0 */
 
 /**
@@ -122,6 +57,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+  uint16_t pwm[] = {500, 500, 500, 500, 500};
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -133,11 +69,12 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  MX_TIM2_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
-	setLed(0, 255, 0, 0);
-	setBrightness(45);
-	send();
+  HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_1, (uint32_t *) pwm, 5);
+  while(!sendFlag){};
+//  __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, 500);
+//  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -160,6 +97,7 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -185,6 +123,12 @@ void SystemClock_Config(void)
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_TIM1;
+  PeriphClkInit.Tim1ClockSelection = RCC_TIM1CLK_HCLK;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
   }

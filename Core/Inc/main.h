@@ -29,16 +29,6 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f3xx_hal.h"
 
-#include "stm32f3xx_ll_rcc.h"
-#include "stm32f3xx_ll_bus.h"
-#include "stm32f3xx_ll_system.h"
-#include "stm32f3xx_ll_exti.h"
-#include "stm32f3xx_ll_cortex.h"
-#include "stm32f3xx_ll_utils.h"
-#include "stm32f3xx_ll_pwr.h"
-#include "stm32f3xx_ll_dma.h"
-#include "stm32f3xx_ll_gpio.h"
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -67,6 +57,23 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define C3_Pin GPIO_PIN_0
+#define C3_GPIO_Port GPIOB
+#define C0_Pin GPIO_PIN_1
+#define C0_GPIO_Port GPIOB
+#define R0_Pin GPIO_PIN_8
+#define R0_GPIO_Port GPIOA
+#define R1_Pin GPIO_PIN_11
+#define R1_GPIO_Port GPIOA
+#define R3_Pin GPIO_PIN_4
+#define R3_GPIO_Port GPIOB
+#define R2_Pin GPIO_PIN_5
+#define R2_GPIO_Port GPIOB
+#define C1_Pin GPIO_PIN_6
+#define C1_GPIO_Port GPIOB
+#define C2_Pin GPIO_PIN_7
+#define C2_GPIO_Port GPIOB
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

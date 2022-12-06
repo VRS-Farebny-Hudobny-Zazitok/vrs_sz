@@ -34,10 +34,77 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+#define MAX_LED 1
+#define USER_BRIGHTNESS 1
+#define PI 3.14159265
+#include <math.h>
+
+
+uint8_t LED_Data[MAX_LED][4];
+uint8_t LED_Mod[MAX_LED][4];
+
+int dataSendFlag = 1;
+
 void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 {
 	HAL_TIM_PWM_Stop_DMA(&htim2, TIM_CHANNEL_1);
+	dataSendFlag = 1;
 }
+
+void setLed(int ledNum, int red, int green, int blue)
+{
+	LED_Data[ledNum][0] = ledNum;
+	LED_Data[ledNum][1] = green;
+	LED_Data[ledNum][2] = red;
+	LED_Data[ledNum][3] = blue;
+}
+
+void setBrightness(int brightness)
+{
+#if USER_BRIGHTNESS
+	if (brightness > 45) brightness = 45;
+	for (int i = 0; i < MAX_LED; i++)
+	{
+		LED_Mod[i][0] = LED_Data[i][0];
+		for (int j = 1; j < 4; j++)
+		{
+			/*float angle = 90 - brightness;
+			angle = angle * PI;
+			LED_Mod[i][j] = (LED_Data[i][j]) / tan(angle);*/
+			LED_Mod[i][j] = LED_Data[i][j];
+		}
+	}
+#endif
+}
+
+uint16_t pwmData[(24 * MAX_LED) + 50];
+
+void send(void)
+{
+	uint32_t index = 0;
+	uint32_t color = 0;
+
+	for (int i = 0; i < MAX_LED; i++)
+	{
+		color = ((LED_Mod[i][1] <<  16) | (LED_Mod[i][2] << 8) | (LED_Mod[i][3]));
+
+		for (int i = 23; i >= 0; i--)
+		{
+			if (color & (1 << i)) pwmData[index] = 60;
+			else pwmData[index] = 30;
+			index++;
+		}
+	}
+	for (int i = 0; i < 50; i++)
+	{
+		pwmData[index] = 0;
+		index++;
+	}
+	HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1, (uint32_t *) pwmData, index);
+	while(!dataSendFlag);
+	dataSendFlag = 0;
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -68,33 +135,16 @@ int main(void)
 	MX_DMA_Init();
 	MX_TIM2_Init();
 	/* USER CODE BEGIN 2 */
-
-//	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
-	int pulse = 0;
-
-	uint16_t pwm[24];
-	uint32_t colors = (255 << 16) | (0 << 8) | (0);
-	for (int i = 23; i >= 0; i--)
-	{
-		if (colors & (1 << i)) pwm[i] = 60;
-		else pwm[i] = 30;
-	}
-	HAL_TIM_PWM_Start_DMA(&htim2, TIM_CHANNEL_1, (uint32_t*) pwm, 24);
+	setLed(0, 255, 0, 0);
+	setBrightness(45);
+	send();
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
-	int rising = 1;
 	while (1)
 	{
-// 		if (rising) pulse++;
-// 		if (!rising) pulse--;
-//
-// 		if (pulse == 101) rising = 0;
-// 		if (pulse == 0) rising = 1;
-//
-// 		__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, pulse);
-// 		HAL_Delay(20);
+
 	}
 	/* USER CODE END WHILE */
 

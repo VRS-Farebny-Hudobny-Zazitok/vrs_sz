@@ -8,6 +8,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <math.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -16,9 +17,8 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define PWM_DATA_BUFF_SIZE 24
-#define NUM_OF_LEDS 3
-#define PWM_TOTAL_DATA_SIZE ((NUM_OF_LEDS * PWM_DATA_BUFF_SIZE) + 50)
+#define MAX_LED 8
+#define USE_BRIGHTNESS 1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -28,125 +28,95 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-//uint16_t pwm[(NUM_OF_LEDS * PWM_DATA_BUFF_SIZE) + 50];
-//uint8_t LED_Data[NUM_OF_LEDS][4];
-//int sendFlag = 0;
+uint8_t LED_Data[MAX_LED][4];
+uint8_t LED_Mod[MAX_LED][4];
+
+int datasentflag = 1;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-//void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
-//{
-//	HAL_TIM_PWM_Stop_DMA(&htim1, TIM_CHANNEL_1);
-////	sendFlag = 1;
-//}
-
-//void LED_setColor(int ledIndex, int red, int green, int blue)
-//{
-//	LED_Data[ledIndex][0] = ledIndex;
-//	LED_Data[ledIndex][1] = green;
-//	LED_Data[ledIndex][2] = red;
-//	LED_Data[ledIndex][3] = blue;
-//}
-//
-//void LED_send()
-//{
-//	uint32_t index = 0;
-//	uint32_t color = 0;
-//
-//	for (int led = 0; led < NUM_OF_LEDS; led++)
-//	{
-//		color = ( (LED_Data[led][1] << 16) | (LED_Data[led][2] << 8) | LED_Data[led][3] );
-//
-//		for (int bit = PWM_DATA_BUFF_SIZE - 1; bit >= 0; bit--)
-//		{
-//			if (color & (1 << bit)) pwm[index] = 53;
-//			else pwm[index] = 26;
-//			index++;
-//		}
-//	}
-//	for (int i = 0; i < 50; i++)
-//	{
-//		pwm[index] = 0;
-//		index++;
-//	}
-//	HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_1, (uint32_t *)pwm, index);
-//	while(!sendFlag);
-//}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-#define MAX_LED 1
-#define USER_BRIGHTNESS 1
-#define PI 3.14159265
-#include <math.h>
-
-
-uint8_t LED_Data[MAX_LED][4];
-uint8_t LED_Mod[MAX_LED][4];
-
-int dataSendFlag = 1;
-
 void HAL_TIM_PWM_PulseFinishedCallback(TIM_HandleTypeDef *htim)
 {
-	HAL_TIM_PWM_Stop_DMA(&htim1, TIM_CHANNEL_1);
-	dataSendFlag = 1;
+	HAL_TIM_PWM_Stop_DMA(&htim1, TIM_CHANNEL_3);
+	datasentflag = 1;
 }
 
-void setLed(int ledNum, int red, int green, int blue)
+void Set_LED(int LEDnum, int Red, int Green, int Blue)
 {
-	LED_Data[ledNum][0] = ledNum;
-	LED_Data[ledNum][1] = green;
-	LED_Data[ledNum][2] = red;
-	LED_Data[ledNum][3] = blue;
+	LED_Data[LEDnum][0] = LEDnum;
+	LED_Data[LEDnum][1] = Green;
+	LED_Data[LEDnum][2] = Red;
+	LED_Data[LEDnum][3] = Blue;
 }
 
-void setBrightness(int brightness)
+#define PI 3.14159265
+
+void Set_Brightness(int brightness)  // 0-45
 {
-#if USER_BRIGHTNESS
+#if USE_BRIGHTNESS
+
 	if (brightness > 45) brightness = 45;
 	for (int i = 0; i < MAX_LED; i++)
 	{
 		LED_Mod[i][0] = LED_Data[i][0];
 		for (int j = 1; j < 4; j++)
 		{
-			float angle = 90 - brightness;
-			angle = angle * PI;
-			LED_Mod[i][j] = (LED_Data[i][j]) / tan(angle);
-//			LED_Mod[i][j] = LED_Data[i][j];
+			float angle = 90 - brightness;  // in degrees
+			angle = angle * PI / 180;  // in rad
+			LED_Mod[i][j] = (LED_Data[i][j]) / (tan(angle));
 		}
 	}
+
 #endif
+
 }
 
 uint16_t pwmData[(24 * MAX_LED) + 50];
 
-void send(void)
+void WS2812_Send(void)
 {
-	uint32_t index = 0;
-	uint32_t color = 0;
+	uint32_t indx = 0;
+	uint32_t color;
 
 	for (int i = 0; i < MAX_LED; i++)
 	{
-		color = ((LED_Mod[i][1] <<  16) | (LED_Mod[i][2] << 8) | (LED_Mod[i][3]));
+#if USE_BRIGHTNESS
+		color = ((LED_Mod[i][1] << 16) | (LED_Mod[i][2] << 8) | (LED_Mod[i][3]));
+#else
+		color = ((LED_Data[i][1]<<16) | (LED_Data[i][2]<<8) | (LED_Data[i][3]));
+#endif
 
 		for (int i = 23; i >= 0; i--)
 		{
-			if (color & (1 << i)) pwmData[index] = 53;
-			else pwmData[index] = 27;
-			index++;
+			if (color & (1 << i))
+			{
+				pwmData[indx] = 53;  // 2/3 of 80
+			}
+
+			else pwmData[indx] = 27;  // 1/3 of 80
+
+			indx++;
 		}
+
 	}
+
 	for (int i = 0; i < 50; i++)
 	{
-		pwmData[index] = 0;
-		index++;
+		pwmData[indx] = 0;
+		indx++;
 	}
-	HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_1, (uint32_t *) pwmData, index);
-	while(!dataSendFlag);
-	dataSendFlag = 0;
+
+	HAL_TIM_PWM_Start_DMA(&htim1, TIM_CHANNEL_3, (uint32_t*) pwmData, indx);
+	while (!datasentflag)
+	{
+	};
+	datasentflag = 0;
 }
 /* USER CODE END 0 */
 
@@ -178,16 +148,31 @@ int main(void)
 	MX_DMA_Init();
 	MX_TIM1_Init();
 	/* USER CODE BEGIN 2 */
-	setLed(0, 255, 0, 0);
-	setBrightness(45);
-	send();
+	for (uint8_t led = 0; led < MAX_LED; led++)
+	{
+		Set_LED(led, 0, 0, 255);
+	}
+	Set_Brightness(15);
+	WS2812_Send();
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1)
 	{
-
+//		for (int i = 0; i < 46; i++)
+//		{
+//			Set_Brightness(i);
+//			WS2812_Send();
+//			HAL_Delay(50);
+//		}
+//
+//		for (int i = 45; i >= 0; i--)
+//		{
+//			Set_Brightness(i);
+//			WS2812_Send();
+//			HAL_Delay(50);
+//		}
 	}
 	/* USER CODE END WHILE */
 

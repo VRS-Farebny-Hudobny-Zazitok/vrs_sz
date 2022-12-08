@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    gpio.h
+  * @file    dac.h
   * @brief   This file contains all the function prototypes for
-  *          the gpio.c file
+  *          the dac.c file
   ******************************************************************************
   * @attention
   *
@@ -18,8 +18,8 @@
   */
 /* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __GPIO_H__
-#define __GPIO_H__
+#ifndef __DAC_H__
+#define __DAC_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -32,11 +32,13 @@ extern "C" {
 
 /* USER CODE END Includes */
 
+extern DAC_HandleTypeDef hdac1;
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
 
-void MX_GPIO_Init(void);
+void MX_DAC1_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 
@@ -45,5 +47,6 @@ void MX_GPIO_Init(void);
 #ifdef __cplusplus
 }
 #endif
-#endif /*__ GPIO_H__ */
+
+#endif /* __DAC_H__ */
 

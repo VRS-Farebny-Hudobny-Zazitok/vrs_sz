@@ -149,10 +149,31 @@ int main(void)
   MX_DMA_Init();
   MX_TIM1_Init();
   MX_DAC1_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
+
+ /*uint8_t dacBuff[48] = {255,255,255,1,1,1,255,255,255,1,1,1,
+		  	  	  	  	 255,255,255,1,1,1,255,255,255,1,1,1,
+						 255,255,255,1,1,1,255,255,255,1,1,1,
+						 255,255,255,1,1,1,255,255,255,1,1,1};*/
+ uint8_t dacBuff[51] = {1,5,10,15,20,25,30,35,40,45,50,55,60,
+  		  	  	  	  	 65,70,75,80,85,90,100,105,110,115,120,125,130,135,140,
+  						 145,150,155,160,165,170,175,180,185,190,195,200,
+  						 205,210,215,220,225,230,235,240,245,250,255};
+
+ uint8_t dacBuff2[27] = {1,10,20,30,40,50,60,70,
+  		  	  	  	  	 80,90,100,110,120,130,140,150,
+  						 160,170,180,190,200,210,220,230,
+  						 240,250,255};
+
+
+ HAL_TIM_Base_Start(&htim3);
  HAL_DAC_Start(&hdac1,DAC_CHANNEL_1);
 
-	/*for (uint8_t led = 0; led < MAX_LED; led++)
+
+
+
+ /*for (uint8_t led = 0; led < MAX_LED; led++)
 	{
 		Set_LED(led, 0, 0, 255);
 	}
@@ -170,6 +191,12 @@ int main(void)
 
   while (1)
 	{
+	  HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)dacBuff, 51, DAC_ALIGN_8B_R);
+	  HAL_Delay (500);
+	  HAL_DAC_Stop_DMA (&hdac1, DAC_CHANNEL_1);
+	  HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)dacBuff2, 27, DAC_ALIGN_8B_R);
+	  HAL_Delay (500);
+	  HAL_DAC_Stop_DMA (&hdac1, DAC_CHANNEL_1);
 //		for (int i = 0; i < 46; i++)
 //		{
 //			Set_Brightness(i);
@@ -187,7 +214,7 @@ int main(void)
 		/*
 		 *Basic triangle output, DAC has no DMA, no TIMER, nothing.
 		 * */
-	    HAL_DAC_SetValue(&hdac1,DAC_CHANNEL_1,DAC_ALIGN_8B_R,data);
+	/*    HAL_DAC_SetValue(&hdac1,DAC_CHANNEL_1,DAC_ALIGN_8B_R,data);
 		  if (data !=1 && data !=255)
 		  {//if not at peaks
 
@@ -206,7 +233,7 @@ int main(void)
 		 // LL_DAC_TrigSWConversion(DAC1,LL_DAC_CHANNEL_1);
 		//  LL_mDelay(1);
 
-
+*/
 	}
     /* USER CODE END WHILE */
 

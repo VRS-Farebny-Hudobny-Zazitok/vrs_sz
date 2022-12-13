@@ -44,6 +44,8 @@ void updateSingleTone(enum TONE tone1, double freq)
 	{
 	    case NONE:  generateNone(temp_buffer, 1, period);break;
 	    case SAW:  generateSaw(temp_buffer, 1, period);break;
+	    case SINE:  generateSine(temp_buffer, 1, period);break;
+	    case TRIANGLE: generateTriangle(temp_buffer, 1, period);break;
 	}
 	//generateSaw(temp_buffer, 1, period);
 
@@ -56,6 +58,7 @@ void updateSingleTone(enum TONE tone1, double freq)
 ///@brief Generate sawtooth signal into buffer
 ///@param buffer - return value from function, generated signal
 ///@param amount - by default should  be one, the function returns amount periods of signal
+/// AMOUNT NOT YET IMPLEMENTED
 ///@param period - amount of dma_time_periods in one signal period, amount of samples per period
 void generateSaw(uint8_t *buffer, uint16_t amount, uint16_t period)
 {
@@ -65,19 +68,94 @@ void generateSaw(uint8_t *buffer, uint16_t amount, uint16_t period)
 
   slope_increment = 254 / (period-1);
 
-  for (int i = 1; i<=period; i++)
+  //TOTO REVERZNI ABY SIEL OD 255 DO NULY
+
+  for (int i = 1; i<period; i++)
   {
     buffer[i] = 1 + (uint8_t) (i*slope_increment);
   }
 
 }
 
+///@brief Generate sawtooth signal into buffer
+///@param buffer - return value from function, generated signal
+///@param amount - by default should  be one, the function returns amount periods of signal
+/// AMOUNT NOT YET IMPLEMENTED
+///@param period - amount of dma_time_periods in one signal period, amount of samples per period
+void generateTriangle(uint8_t *buffer, uint16_t amount, uint16_t period)
+{
+  uint8_t offset;
+  uint8_t mid;
+
+  if (period % 2 ==0)
+  {//even number
+	  offset = 0;
+	  mid = period/2;
+  }
+  else
+  {//odd number
+	 offset = 1;
+	 mid = (period-1)/2;
+  }
+
+
+  buffer[0] = 1;
+
+  buffer[mid] = 255;
+
+
+  double slope_increment;
+
+  slope_increment = 254 / mid;
+
+
+
+  for (int i = mid; i>1; i--)
+  {
+    buffer[i] = 255 - (uint8_t) (i*slope_increment);
+  }
+
+  for (int i = mid, j = mid; i>1; i--,j++)
+  {
+    buffer[j] = 255 - (uint8_t) (i*slope_increment);
+  }
+
+}
+
+
+///@brief Generate sine signal into buffer
+///@param buffer - return value from function, generated signal
+///@param amount - by default should  be one, the function returns amount periods of signal
+///@param period - amount of dma_time_periods in one signal period, amount of samples per period
+void generateSine(uint8_t *buffer, uint16_t amount, uint16_t period)
+{
+  uint8_t median = 128;
+  uint8_t amplitude = 127;
+
+  buffer[0] = median;
+
+  double slope_increment;
+
+  slope_increment = 6.28 / (period-1);
+
+
+  for (int i = 1; i<period; i++)
+  {
+    buffer[i] = median + (int16_t) (amplitude *  sin (i*slope_increment));
+  }
+
+}
+
+
+///@brief Generate NONE signal into buffer, fills buffer with zeros
+/// other params than buffer are not important right now
+///@param buffer - return value from function, generated signal
 void generateNone(uint8_t *buffer, uint16_t amount, uint16_t period)
 {
   buffer[0] = 0;
 
 
-  for (int i = 1; i<=period; i++)
+  for (int i = 1; i<period; i++)
   {
     buffer[i] = 0;
   }

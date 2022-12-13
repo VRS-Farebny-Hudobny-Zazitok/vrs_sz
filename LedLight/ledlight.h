@@ -35,6 +35,6 @@ typedef struct sColor
 void setLed(uint8_t lightIndex, Color *ledLight, Color color);
 void setBrightness(uint8_t value);
 void prepareSend(Color *ledLight);
-void sendLedData(Color *ledLight);
+void initialLedReset(Color *ledLight);
 
 #endif /* LEDLIGHT_H_ */

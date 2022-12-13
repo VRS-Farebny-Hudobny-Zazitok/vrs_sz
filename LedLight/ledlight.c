@@ -23,7 +23,7 @@ void setBrightness(uint8_t value)
 	else brightness = value;
 }
 
-void prepareSend(Color *ledLight)
+void sendLedData(Color *ledLight)
 {
 	uint8_t index = 0;
 	uint32_t color = 0;
@@ -66,8 +66,6 @@ void initialLedReset(Color *ledLight){
 	  setBackingTrackColor(ledLight, OFF);
 
 	  for (int i = 0; i < 10; i++) {
-		prepareSend(ledLight);
+		 sendLedData(ledLight);
 	  }
 }
-
-

@@ -96,14 +96,14 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_TIM1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  HAL_TIM_Base_Start_IT(&htim2);
   initialLedReset(ledLight);
-
   setBrightness(5);
-  setMainToneColor(ledLight, MAGENTA);
+  setMainToneColor(ledLight, GREEN);
   setBeatColor(ledLight, GREEN);
-  setBackingTrackColor(ledLight, RED);
-  prepareSend(ledLight);
+  setBackingTrackColor(ledLight, GREEN);
 
   /* USER CODE END 2 */
 

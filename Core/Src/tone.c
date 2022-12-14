@@ -110,14 +110,14 @@ void generateTriangle(uint8_t *buffer, uint16_t amount, uint16_t period)
 
 
 
-  for (int i = mid; i>1; i--)
+  for (int i = mid-1, j = 1; i>=1; i--,j++)
   {
-    buffer[i] = 255 - (uint8_t) (i*slope_increment);
+    buffer[i] = 255 - (uint8_t) (j*slope_increment);
   }
 
-  for (int i = mid, j = mid; i>1; i--,j++)
+  for (int i = mid+1, j = 1; i<period; i++,j++)
   {
-    buffer[j] = 255 - (uint8_t) (i*slope_increment);
+    buffer[i] = 255 - (uint8_t) (j*slope_increment);
   }
 
 }

@@ -163,7 +163,7 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  updateSingleTone(SINE, E4);
+  updateSingleTone(TRIANGLE, E4);
   HAL_Delay(100);
   updateSingleTone(SINE, E4);
   HAL_Delay(100);

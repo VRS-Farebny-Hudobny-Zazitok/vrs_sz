@@ -6,12 +6,14 @@
 #include "dma.h"
 #include "tim.h"
 #include "gpio.h"
-#include "tone.h"
-#include "notes.h"
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <math.h>
+
+#include "tone.h"
+#include "notes.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -156,34 +158,34 @@ int main(void)
   MX_DAC1_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-
+  srand((unsigned) time(NULL));
   initToneSystem();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  updateSingleTone(SQUARE, E3);
+  updateSingleTone(NOISE, E3);
   HAL_Delay(100);
-  updateSingleTone(SQUARE, E3);
-  HAL_Delay(100);
-  updateSingleTone(NONE, E3);
-  HAL_Delay(100);
-  updateSingleTone(SQUARE, E3);
+  updateSingleTone(NOISE, E3);
   HAL_Delay(100);
   updateSingleTone(NONE, E3);
   HAL_Delay(100);
-  updateSingleTone(SQUARE, C3);
+  updateSingleTone(NOISE, E3);
   HAL_Delay(100);
-  updateSingleTone(SQUARE, E3);
+  updateSingleTone(NONE, E3);
+  HAL_Delay(100);
+  updateSingleTone(NOISE, C3);
+  HAL_Delay(100);
+  updateSingleTone(NOISE, E3);
   HAL_Delay(200);
  // updateSingleTone(NONE, E4);
   //HAL_Delay(100);
-  updateSingleTone(SQUARE, G3);
+  updateSingleTone(NOISE, G3);
   HAL_Delay(200);
   updateSingleTone(NONE, E3);
   HAL_Delay(200);
-  updateSingleTone(SQUARE, G2);
+  updateSingleTone(NOISE, G2);
   HAL_Delay(200);
   updateSingleTone(NONE, G2);
   while (1)

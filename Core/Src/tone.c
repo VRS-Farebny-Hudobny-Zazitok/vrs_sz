@@ -47,6 +47,7 @@ void updateSingleTone(enum TONE tone1, double freq)
 	    case SINE:  generateSine(temp_buffer, 1, period);break;
 	    case TRIANGLE: generateTriangle(temp_buffer, 1, period);break;
 	    case SQUARE: generateSquare(temp_buffer, 1, period);break;
+	    case NOISE: generateNoise(temp_buffer, 1, period);break;
 	}
 
     HAL_DAC_Stop_DMA (&hdac1, DAC_CHANNEL_1);
@@ -72,6 +73,23 @@ void generateSaw(uint8_t *buffer, uint16_t amount, uint16_t period)
   for (int i = 1; i<period; i++)
   {
     buffer[i] = 1 + (uint8_t) (i*slope_increment);
+  }
+
+}
+
+
+///@brief Generate noise signal into buffer
+///@param buffer - return value from function, generated signal
+///@param amount - by default should  be one, the function returns amount periods of signal
+/// AMOUNT NOT YET IMPLEMENTED
+///@param period - amount of dma_time_periods in one signal period, amount of samples per period
+void generateNoise(uint8_t *buffer, uint16_t amount, uint16_t period)
+{
+
+
+  for (int i = 0; i<period; i++)
+  {
+    buffer[i] =  (uint8_t) ((AWGN_generator()*127.0)+128);
   }
 
 }
@@ -199,4 +217,36 @@ void generateNone(uint8_t *buffer, uint16_t amount, uint16_t period)
     buffer[i] = 0;
   }
 
+}
+
+//credit: Cagri Tanriover
+double AWGN_generator()
+{/* Generates additive white Gaussian Noise samples with zero mean and a standard deviation of 1. */
+
+  double temp1;
+  double temp2;
+  double result;
+  int p;
+  p = 1;
+  while( p > 0 )
+  {
+	temp2 = ( rand() / ( (double)RAND_MAX ) ); /*  rand() function generates an
+                                                       integer between 0 and  RAND_MAX,
+                                                       which is defined in stdlib.h.
+                                                   */
+    if ( temp2 == 0 )
+    {// temp2 is >= (RAND_MAX / 2)
+      p = 1;
+    }// end if
+    else
+    {// temp2 is < (RAND_MAX / 2)
+       p = -1;
+    }// end else
+
+  }// end while()
+
+  temp1 = cos( ( 2.0 * (double)3.14 ) * rand() / ( (double)RAND_MAX ) );
+  result = sqrt( -2.0 * log( temp2 ) ) * temp1;
+
+  return result;	// return the generated random sample to the caller
 }

@@ -8,7 +8,7 @@
 #include "dma.h"
 #include "tim.h"
 #include "math.h"
-
+#include <stdlib.h>
 
 #define MIN_NUM_SAMPLES 8
 #define DMA_TIME_PERIOD 0.000250
@@ -44,5 +44,7 @@ void generateTriangle(uint8_t *buffer, uint16_t length, uint16_t period);
 void generateNoise(uint8_t *buffer, uint16_t length, uint16_t period);
 
 void generateNone(uint8_t *buffer, uint16_t length, uint16_t period);
+
+double AWGN_generator();
 
 #endif

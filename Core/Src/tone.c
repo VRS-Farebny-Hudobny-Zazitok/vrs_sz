@@ -46,9 +46,8 @@ void updateSingleTone(enum TONE tone1, double freq)
 	    case SAW:  generateSaw(temp_buffer, 1, period);break;
 	    case SINE:  generateSine(temp_buffer, 1, period);break;
 	    case TRIANGLE: generateTriangle(temp_buffer, 1, period);break;
+	    case SQUARE: generateSquare(temp_buffer, 1, period);break;
 	}
-	//generateSaw(temp_buffer, 1, period);
-
 
     HAL_DAC_Stop_DMA (&hdac1, DAC_CHANNEL_1);
     HAL_DAC_Start_DMA(&hdac1, DAC_CHANNEL_1, (uint32_t*)temp_buffer, period, DAC_ALIGN_8B_R);
@@ -77,7 +76,7 @@ void generateSaw(uint8_t *buffer, uint16_t amount, uint16_t period)
 
 }
 
-///@brief Generate sawtooth signal into buffer
+///@brief Generate triangle signal into buffer
 ///@param buffer - return value from function, generated signal
 ///@param amount - by default should  be one, the function returns amount periods of signal
 /// AMOUNT NOT YET IMPLEMENTED
@@ -120,8 +119,48 @@ void generateTriangle(uint8_t *buffer, uint16_t amount, uint16_t period)
     buffer[i] = 255 - (uint8_t) (j*slope_increment);
   }
 
+  if (offset ==1)
+  buffer[period-1] =  1;
+
 }
 
+
+///@brief Generate square signal into buffer
+///@param buffer - return value from function, generated signal
+///@param amount - by default should  be one, the function returns amount periods of signal
+/// AMOUNT NOT YET IMPLEMENTED
+///@param period - amount of dma_time_periods in one signal period, amount of samples per period
+void generateSquare(uint8_t *buffer, uint16_t amount, uint16_t period)
+{
+  uint8_t offset;
+  uint8_t mid;
+
+  if (period % 2 ==0)
+  {//even number
+	  offset = 0;
+	  mid = period/2;
+  }
+  else
+  {//odd number
+	 offset = 1;
+	 mid = (period)/2+offset;
+  }
+
+
+  for (int i = 0; i<mid; i++ )
+   {
+       buffer[i] = 255;
+   }
+
+   for (int i = mid; i<period; i++ )
+   {
+       buffer[i] = 1;
+   }
+
+  if (offset ==1)
+  buffer[mid-1] =  128;
+
+}
 
 ///@brief Generate sine signal into buffer
 ///@param buffer - return value from function, generated signal

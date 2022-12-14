@@ -163,29 +163,29 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  updateSingleTone(TRIANGLE, E4);
+  updateSingleTone(SQUARE, E3);
   HAL_Delay(100);
-  updateSingleTone(SINE, E4);
+  updateSingleTone(SQUARE, E3);
   HAL_Delay(100);
-  updateSingleTone(NONE, E4);
+  updateSingleTone(NONE, E3);
   HAL_Delay(100);
-  updateSingleTone(SINE, E4);
+  updateSingleTone(SQUARE, E3);
   HAL_Delay(100);
-  updateSingleTone(NONE, E4);
+  updateSingleTone(NONE, E3);
   HAL_Delay(100);
-  updateSingleTone(SINE, C4);
+  updateSingleTone(SQUARE, C3);
   HAL_Delay(100);
-  updateSingleTone(SINE, E4);
+  updateSingleTone(SQUARE, E3);
   HAL_Delay(200);
  // updateSingleTone(NONE, E4);
   //HAL_Delay(100);
-  updateSingleTone(SINE, G4);
+  updateSingleTone(SQUARE, G3);
   HAL_Delay(200);
-  updateSingleTone(NONE, E4);
+  updateSingleTone(NONE, E3);
   HAL_Delay(200);
-  updateSingleTone(SINE, 176.02);
+  updateSingleTone(SQUARE, G2);
   HAL_Delay(200);
-  updateSingleTone(NONE, 176.02);
+  updateSingleTone(NONE, G2);
   while (1)
 	{
 

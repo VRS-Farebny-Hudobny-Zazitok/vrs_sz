@@ -2,7 +2,7 @@
  * tone.c
  *
  *  Created on: 13. 12. 2022
- *      Author: micha
+ *      Author: michal
  */
 #include "tone.h"
 
@@ -53,7 +53,7 @@ void updateMultipleTone(enum TONE tone[], double freq[])
 
     for (int i = 1; i<tone_amount; i++)
     {
-    	if (amount[i]*period[i]<buf_length)
+    	if (amount[i]*period[i]>buf_length) //slightly better sound when it's >
     		buf_length = amount[i]*period[i];
     }
 
@@ -64,10 +64,16 @@ void updateMultipleTone(enum TONE tone[], double freq[])
     for (int i = 0; i<MAX_DMA_LENGTH; i++)
     {
     	return_buffer[i] = 0;
+
     }
 
     for (int i = 0; i<tone_amount; i++)
     {
+        for (int i = 0; i<MAX_DMA_LENGTH; i++)
+        {
+        	temp_buffer[i] = 0;
+
+        }
     	switch (tone[i])
     		{
     		    case NONE:  generateNone(temp_buffer, amount[i], period[i]);break;
@@ -160,12 +166,10 @@ void generateNoise(uint8_t *buffer, uint16_t amount, uint16_t period)
 ///@brief Generate triangle signal into buffer
 ///@param buffer - return value from function, generated signal
 ///@param amount - by default should  be one, the function returns amount periods of signal
-/// AMOUNT NOT YET IMPLEMENTED
 ///@param period - amount of dma_time_periods in one signal period, amount of samples per period
 void generateTriangle(uint8_t *buffer, uint16_t amount, uint16_t period)
 {
 
-	//AMOUNT
   uint8_t offset;
   uint8_t mid;
 
@@ -181,33 +185,31 @@ void generateTriangle(uint8_t *buffer, uint16_t amount, uint16_t period)
   }
 
 
-
-
-
-  buffer[0] = 1;
-
-  buffer[mid] = 255;
-
-
   double slope_increment;
-
   slope_increment = 254.0 / (double)mid;
 
 
-
-  for (int i = mid-1, j = 1; i>=1; i--,j++)
+  for (int k = 0; k<amount*period;k=k+period)
   {
-    buffer[i] = 255 - (uint8_t) (j*slope_increment);
+
+	buffer[k] = 1;
+
+	buffer[k+mid] = 255;
+
+	for (int i = k+mid-1, j = 1; i>=k+1; i--,j++)
+	{
+	buffer[i] = 255 - (uint8_t) (j*slope_increment);
+	}
+
+	for (int i = k+mid+1, j = 1; i<k+period; i++,j++)
+	{
+	buffer[i] = 255 - (uint8_t) (j*slope_increment);
+	}
+
+	if (offset ==1)
+	buffer[k+period-1] =  1;
+
   }
-
-  for (int i = mid+1, j = 1; i<period; i++,j++)
-  {
-    buffer[i] = 255 - (uint8_t) (j*slope_increment);
-  }
-
-  if (offset ==1)
-  buffer[period-1] =  1;
-
 }
 
 

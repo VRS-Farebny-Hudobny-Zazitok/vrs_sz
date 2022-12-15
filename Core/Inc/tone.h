@@ -13,7 +13,7 @@
 
 //#define DMA_TIME_PERIOD 0.000250
 #define DMA_TIME_PERIOD 0.000125
-#define MAX_DMA_LENGTH 340
+#define MAX_DMA_LENGTH 500
 #define MAX_NUM_TONES 4
 
 enum TONE

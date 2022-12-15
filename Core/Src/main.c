@@ -168,7 +168,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 
   tones[0] = SQUARE;
-  tones[1] = NOISE;
+  tones[1] = TRIANGLE;
   tones[2] = NONE;
   tones[3] = NONE;
 
@@ -203,7 +203,7 @@ int main(void)
   updateSingleTone(NONE, G2);*/
  /* for (int l = 0; l<3;l++)
   {
-	  freqs[0] = E4;
+  freqs[0] = E4;
   updateMultipleTone(tones,freqs);
   HAL_Delay(200);
   freqs[0] = F4;
@@ -226,14 +226,22 @@ int main(void)
    freqs[0] = G4;
    updateMultipleTone(tones,freqs);
    HAL_Delay(200);
-   }
+   }*/
   updateSingleTone(NONE, G2);
-*/
-  updateMultipleTone(tones,freqs);
+
+ // updateMultipleTone(tones,freqs);
   while (1)
 	{
 
-
+	  freqs[0] = E4;
+	  updateMultipleTone(tones,freqs);
+	  HAL_Delay(200);
+	  freqs[0] = F4;
+	  updateMultipleTone(tones,freqs);
+	  HAL_Delay(200);
+	  freqs[0] = G4;
+	  updateMultipleTone(tones,freqs);
+	  HAL_Delay(200);
 	}
     /* USER CODE END WHILE */
 

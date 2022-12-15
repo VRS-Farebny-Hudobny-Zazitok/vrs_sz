@@ -37,8 +37,9 @@
 uint8_t LED_Data[MAX_LED][4];
 uint8_t LED_Mod[MAX_LED][4];
 
-uint8_t tones[4];
-double freqs[4];
+//for control of multipleTone api
+uint8_t tones[] = {NONE,NONE,NONE,NONE};
+double freqs[] = {0,0,0,0};
 
 int datasentflag = 1;
 /* USER CODE END PV */
@@ -166,44 +167,72 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  tones[0] = SAW;
-  tones[1] = SAW;
-  tones[2] = SAW;
+  tones[0] = SQUARE;
+  tones[1] = NOISE;
+  tones[2] = NONE;
   tones[3] = NONE;
 
-  freqs[0] = C4;
-  freqs[1] = E4;
-  freqs[2] = G4;
+  freqs[0] = C3;
+  freqs[1] = E3;
+  freqs[2] = G3;
   freqs[3] = 0;
 
-  updateMultipleTone(tones,freqs);
 
-/*  updateSingleTone(SAW, E4);
-
+ /* updateSingleTone(NOISE, E4);
   HAL_Delay(100);
-  updateSingleTone(SAW, E4);
+  updateSingleTone(NOISE, E4);
   HAL_Delay(100);
   updateSingleTone(NONE, E4);
   HAL_Delay(100);
-  updateSingleTone(SAW, E4);
+  updateSingleTone(NOISE, E4);
   HAL_Delay(100);
   updateSingleTone(NONE, E4);
   HAL_Delay(100);
-  updateSingleTone(SAW, C4);
+  updateSingleTone(NOISE, C4);
   HAL_Delay(100);
-  updateSingleTone(SAW, E4);
+  updateSingleTone(NOISE, E4);
   HAL_Delay(200);
  // updateSingleTone(NONE, E4);
   //HAL_Delay(100);
-  updateSingleTone(SAW, G4);
+  updateSingleTone(NOISE, G4);
   HAL_Delay(200);
   updateSingleTone(NONE, E4);
   HAL_Delay(200);
-  updateSingleTone(SAW, G3);
+  updateSingleTone(NOISE, G3);
   HAL_Delay(200);
   updateSingleTone(NONE, G2);*/
+ /* for (int l = 0; l<3;l++)
+  {
+	  freqs[0] = E4;
+  updateMultipleTone(tones,freqs);
+  HAL_Delay(200);
+  freqs[0] = F4;
+  updateMultipleTone(tones,freqs);
+  HAL_Delay(200);
+  freqs[0] = G4;
+  updateMultipleTone(tones,freqs);
+  HAL_Delay(200);
+  }*/
+
+  //tones[1] = SINE;
+ /* for (int l = 0; l<3;l++)
+   {
+ 	  freqs[0] = E4;
+   updateMultipleTone(tones,freqs);
+   HAL_Delay(200);
+   freqs[0] = F4;
+   updateMultipleTone(tones,freqs);
+   HAL_Delay(200);
+   freqs[0] = G4;
+   updateMultipleTone(tones,freqs);
+   HAL_Delay(200);
+   }
+  updateSingleTone(NONE, G2);
+*/
+  updateMultipleTone(tones,freqs);
   while (1)
 	{
+
 
 	}
     /* USER CODE END WHILE */

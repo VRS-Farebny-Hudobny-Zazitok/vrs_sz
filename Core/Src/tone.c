@@ -6,9 +6,10 @@
  */
 #include "tone.h"
 
+///@brief run this before playing any tones
+/// launching DAC
 void initToneSystem()
 {
-    //launching DAC
     HAL_TIM_Base_Start(&htim3);
     HAL_DAC_Start(&hdac1,DAC_CHANNEL_1);
 }
@@ -33,7 +34,11 @@ void updateMultipleTone(enum TONE tone[], double freq[])
     }
 
 
-    //PRIROB DEFAULT AK SU VSETKY NULA
+    if (tone_amount == 0)
+    {
+    	updateSingleTone(NONE,440);
+        return;
+    }
 
     uint8_t amount[MAX_NUM_TONES];
     uint16_t period[MAX_NUM_TONES];
@@ -87,7 +92,9 @@ void updateMultipleTone(enum TONE tone[], double freq[])
 
 }
 
-
+///@brief Plays tone composed of a single signal
+///@param tone1 type of signal to play
+///@param freq frequency of tone in Hz
 void updateSingleTone(enum TONE tone1, double freq)
 {
 
@@ -112,7 +119,6 @@ void updateSingleTone(enum TONE tone1, double freq)
 ///@brief Generate sawtooth signal into buffer
 ///@param buffer - return value from function, generated signal
 ///@param amount - by default should  be one, the function returns amount periods of signal
-/// AMOUNT NOT YET IMPLEMENTED
 ///@param period - amount of dma_time_periods in one signal period, amount of samples per period
 void generateSaw(uint8_t *buffer, uint16_t amount, uint16_t period)
 {
@@ -138,15 +144,15 @@ void generateSaw(uint8_t *buffer, uint16_t amount, uint16_t period)
 ///@brief Generate noise signal into buffer
 ///@param buffer - return value from function, generated signal
 ///@param amount - by default should  be one, the function returns amount periods of signal
-/// AMOUNT NOT YET IMPLEMENTED
 ///@param period - amount of dma_time_periods in one signal period, amount of samples per period
+///period and amount only determine the length of samples generated
 void generateNoise(uint8_t *buffer, uint16_t amount, uint16_t period)
 {
 
 
-  for (int i = 0; i<period; i++)
+  for (int i = 0; i<(period*amount); i++)
   {
-    buffer[i] =  (uint8_t) ((AWGN_generator()*127.0)+128);
+    buffer[i] =  (uint8_t) ((AWGN_generator()*100)+100);
   }
 
 }
@@ -159,6 +165,7 @@ void generateNoise(uint8_t *buffer, uint16_t amount, uint16_t period)
 void generateTriangle(uint8_t *buffer, uint16_t amount, uint16_t period)
 {
 
+	//AMOUNT
   uint8_t offset;
   uint8_t mid;
 
@@ -172,6 +179,9 @@ void generateTriangle(uint8_t *buffer, uint16_t amount, uint16_t period)
 	 offset = 1;
 	 mid = (period-1)/2;
   }
+
+
+
 
 
   buffer[0] = 1;
@@ -204,7 +214,6 @@ void generateTriangle(uint8_t *buffer, uint16_t amount, uint16_t period)
 ///@brief Generate square signal into buffer
 ///@param buffer - return value from function, generated signal
 ///@param amount - by default should  be one, the function returns amount periods of signal
-/// AMOUNT NOT YET IMPLEMENTED
 ///@param period - amount of dma_time_periods in one signal period, amount of samples per period
 void generateSquare(uint8_t *buffer, uint16_t amount, uint16_t period)
 {
@@ -222,20 +231,21 @@ void generateSquare(uint8_t *buffer, uint16_t amount, uint16_t period)
 	 mid = (period)/2+offset;
   }
 
+  for (int k = 0; k<amount*period;k=k+period)
+  {
+	  for (int i = k; i<(k+mid); i++ )
+	   {
+		   buffer[i] = 255;
+	   }
 
-  for (int i = 0; i<mid; i++ )
-   {
-       buffer[i] = 255;
-   }
+	   for (int i = k+mid; i<(k+period); i++ )
+	   {
+		   buffer[i] = 1;
+	   }
 
-   for (int i = mid; i<period; i++ )
-   {
-       buffer[i] = 1;
-   }
-
-  if (offset ==1)
-  buffer[mid-1] =  128;
-
+		if (offset ==1)
+		buffer[k+mid-1] =  128;
+  }
 }
 
 ///@brief Generate sine signal into buffer
@@ -247,18 +257,20 @@ void generateSine(uint8_t *buffer, uint16_t amount, uint16_t period)
   uint8_t median = 128;
   uint8_t amplitude = 127;
 
-  buffer[0] = median;
+
 
   double slope_increment;
 
   slope_increment = 6.28 / (double)(period-1);
 
-
+  for (int k = 0; k<amount*period;k=k+period)
+  {
+	  buffer[k] = median;
   for (int i = 1; i<period; i++)
   {
-    buffer[i] = median + (int16_t) (amplitude *  sin (i*slope_increment));
+	buffer[k+i] = median + (int16_t) (amplitude *  sin (i*slope_increment));
   }
-
+  }
 }
 
 
@@ -269,7 +281,6 @@ void generateNone(uint8_t *buffer, uint16_t amount, uint16_t period)
 {
   buffer[0] = 0;
 
-
   for (int i = 1; i<period; i++)
   {
     buffer[i] = 0;
@@ -277,10 +288,11 @@ void generateNone(uint8_t *buffer, uint16_t amount, uint16_t period)
 
 }
 
-//credit: Cagri Tanriover
+///@brief Generates additive white Gaussian Noise samples with zero mean and a standard deviation of 1.
+///credit: Cagri Tanriover
+///https://www.embeddedrelated.com/showcode/311.php
 double AWGN_generator()
-{/* Generates additive white Gaussian Noise samples with zero mean and a standard deviation of 1. */
-
+{
   double temp1;
   double temp2;
   double result;
@@ -288,23 +300,19 @@ double AWGN_generator()
   p = 1;
   while( p > 0 )
   {
-	temp2 = ( rand() / ( (double)RAND_MAX ) ); /*  rand() function generates an
-                                                       integer between 0 and  RAND_MAX,
-                                                       which is defined in stdlib.h.
-                                                   */
+	temp2 = ( rand() / ( (double)RAND_MAX ) );
     if ( temp2 == 0 )
-    {// temp2 is >= (RAND_MAX / 2)
+    {
       p = 1;
-    }// end if
+    }
     else
-    {// temp2 is < (RAND_MAX / 2)
+    {
        p = -1;
-    }// end else
-
-  }// end while()
+    }
+  }
 
   temp1 = cos( ( 2.0 * (double)3.14 ) * rand() / ( (double)RAND_MAX ) );
   result = sqrt( -2.0 * log( temp2 ) ) * temp1;
 
-  return result;	// return the generated random sample to the caller
+  return result;
 }

@@ -8,18 +8,7 @@
 #ifndef NOTES_H_
 #define NOTES_H_
 
-#define C1		32.70f
-#define Cis1	34.65f
-#define D1		36.71f
-#define Dis1	38.89f
-#define E1		41.20f
-#define F1		43.65f
-#define Fis1	46.25f
-#define G1		49.00f
-#define Gis1	51.91f
-#define A1		55.00f
-#define Ais1	58.27f
-#define H1		61.74f
+
 #define C2		65.41f
 #define Cis2	69.30f
 #define D2		73.42f

@@ -7,7 +7,6 @@
 #include "tim.h"
 #include "gpio.h"
 
-
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include <math.h>
@@ -38,6 +37,8 @@
 uint8_t LED_Data[MAX_LED][4];
 uint8_t LED_Mod[MAX_LED][4];
 
+uint8_t tones[4];
+double freqs[4];
 
 int datasentflag = 1;
 /* USER CODE END PV */
@@ -165,29 +166,42 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  updateSingleTone(NOISE, E3);
+  tones[0] = SAW;
+  tones[1] = SAW;
+  tones[2] = SAW;
+  tones[3] = NONE;
+
+  freqs[0] = C4;
+  freqs[1] = E4;
+  freqs[2] = G4;
+  freqs[3] = 0;
+
+  updateMultipleTone(tones,freqs);
+
+/*  updateSingleTone(SAW, E4);
+
   HAL_Delay(100);
-  updateSingleTone(NOISE, E3);
+  updateSingleTone(SAW, E4);
   HAL_Delay(100);
-  updateSingleTone(NONE, E3);
+  updateSingleTone(NONE, E4);
   HAL_Delay(100);
-  updateSingleTone(NOISE, E3);
+  updateSingleTone(SAW, E4);
   HAL_Delay(100);
-  updateSingleTone(NONE, E3);
+  updateSingleTone(NONE, E4);
   HAL_Delay(100);
-  updateSingleTone(NOISE, C3);
+  updateSingleTone(SAW, C4);
   HAL_Delay(100);
-  updateSingleTone(NOISE, E3);
+  updateSingleTone(SAW, E4);
   HAL_Delay(200);
  // updateSingleTone(NONE, E4);
   //HAL_Delay(100);
-  updateSingleTone(NOISE, G3);
+  updateSingleTone(SAW, G4);
   HAL_Delay(200);
-  updateSingleTone(NONE, E3);
+  updateSingleTone(NONE, E4);
   HAL_Delay(200);
-  updateSingleTone(NOISE, G2);
+  updateSingleTone(SAW, G3);
   HAL_Delay(200);
-  updateSingleTone(NONE, G2);
+  updateSingleTone(NONE, G2);*/
   while (1)
 	{
 

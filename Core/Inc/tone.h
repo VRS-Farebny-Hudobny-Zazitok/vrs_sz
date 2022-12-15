@@ -10,9 +10,12 @@
 #include "math.h"
 #include <stdlib.h>
 
-#define MIN_NUM_SAMPLES 8
-#define DMA_TIME_PERIOD 0.000250
-#define MAX_DMA_LENGTH 255
+
+//#define DMA_TIME_PERIOD 0.000250
+#define DMA_TIME_PERIOD 0.000125
+#define MAX_DMA_LENGTH 340
+#define MAX_NUM_TONES 4
+
 enum TONE
 {
   NONE = 1,
@@ -26,24 +29,21 @@ enum TONE
 
 void initToneSystem();
 
-void updateTone(enum TONE tone1, double freq1,
-		        enum TONE tone2, double freq2,
-		        enum TONE tone3, double freq3,
-	       	    enum TONE tone4, double freq4);
+void updateMultipleTone(enum TONE tone[], double freq[]);
 
 void updateSingleTone(enum TONE tone1, double freq);
 
-void generateSine(uint8_t *buffer, uint16_t length, uint16_t period);
+void generateSine(uint8_t *buffer, uint16_t amount, uint16_t period);
 
-void generateSaw(uint8_t *buffer, uint16_t length, uint16_t period);
+void generateSaw(uint8_t *buffer, uint16_t amount, uint16_t period);
 
-void generateSquare(uint8_t *buffer, uint16_t length, uint16_t period);
+void generateSquare(uint8_t *buffer, uint16_t amount, uint16_t period);
 
-void generateTriangle(uint8_t *buffer, uint16_t length, uint16_t period);
+void generateTriangle(uint8_t *buffer, uint16_t amount, uint16_t period);
 
-void generateNoise(uint8_t *buffer, uint16_t length, uint16_t period);
+void generateNoise(uint8_t *buffer, uint16_t amount, uint16_t period);
 
-void generateNone(uint8_t *buffer, uint16_t length, uint16_t period);
+void generateNone(uint8_t *buffer, uint16_t amount, uint16_t period);
 
 double AWGN_generator();
 

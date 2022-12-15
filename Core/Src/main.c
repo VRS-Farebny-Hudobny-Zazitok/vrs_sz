@@ -37,7 +37,7 @@
 uint8_t LED_Data[MAX_LED][4];
 uint8_t LED_Mod[MAX_LED][4];
 
-//for control of multipleTone api
+//for control of multiTone api
 uint8_t tones[] = {NONE,NONE,NONE,NONE};
 double freqs[] = {0,0,0,0};
 
@@ -168,12 +168,12 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 
   tones[0] = SQUARE;
-  tones[1] = TRIANGLE;
+  tones[1] = SINE;
   tones[2] = NONE;
   tones[3] = NONE;
 
-  freqs[0] = C3;
-  freqs[1] = E3;
+  freqs[0] = E4;
+  freqs[1] = G4;
   freqs[2] = G3;
   freqs[3] = 0;
 
@@ -227,13 +227,15 @@ int main(void)
    updateMultipleTone(tones,freqs);
    HAL_Delay(200);
    }*/
-  updateSingleTone(NONE, G2);
+ // freqs[0] = E4;
+  updateMultipleTone(tones,freqs);
+  //updateSingleTone(NONE, G2);
 
  // updateMultipleTone(tones,freqs);
   while (1)
 	{
 
-	  freqs[0] = E4;
+	/*  freqs[0] = E4;
 	  updateMultipleTone(tones,freqs);
 	  HAL_Delay(200);
 	  freqs[0] = F4;
@@ -241,7 +243,7 @@ int main(void)
 	  HAL_Delay(200);
 	  freqs[0] = G4;
 	  updateMultipleTone(tones,freqs);
-	  HAL_Delay(200);
+	  HAL_Delay(200);*/
 	}
     /* USER CODE END WHILE */
 

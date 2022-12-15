@@ -21,24 +21,34 @@ uint16_t freqToPeriod(double freq)
     return ((uint16_t) (t/DMA_TIME_PERIOD));
 }
 
-///
+///@brief mixes up to four signals and plays the resulting tone
+/// Multi tone API
+///@param tone[] Array of TONE with the length of 4,
+/// Can have from 0 to 4 tones.
+/// Array starts with tones that are other than NONE, the rest (unused channels) are NONE
+/// If all are NONE, then the function call single tone API with NONE parameter
+///@param freq[] Array of tone frequencies corresponding to tone[].
+/// Must have the same length as tone[]
+/// values corresponding to NONE tones are ignored
 void updateMultipleTone(enum TONE tone[], double freq[])
 {
 
     uint8_t tone_amount = 0;
 
+    //determine amount of non-NONE tones
     for (int i = 0; i<MAX_NUM_TONES; i++)
     {
     	if (tone[i]!=NONE)
     	    	tone_amount++;
     }
 
-
+    //in case all are NONE
     if (tone_amount == 0)
     {
     	updateSingleTone(NONE,440);
         return;
     }
+
 
     uint8_t amount[MAX_NUM_TONES];
     uint16_t period[MAX_NUM_TONES];
@@ -49,31 +59,52 @@ void updateMultipleTone(enum TONE tone[], double freq[])
     	amount[i] = (uint8_t) (MAX_DMA_LENGTH/period[i]);
     }
 
-    uint16_t buf_length = amount[0]*period[0];
+    //in case we find LCM then everything is fine
+    uint16_t buf_length;
+    buf_length= LCM_generator(period,tone_amount);
 
-    for (int i = 1; i<tone_amount; i++)
+    if (buf_length==0)
     {
-    	if (amount[i]*period[i]>buf_length) //slightly better sound when it's >
-    		buf_length = amount[i]*period[i];
+    	//no LCM, some signals are going to be trimmed/have deaf areas
+		buf_length = amount[0]*period[0];
+
+		for (int i = 1; i<tone_amount; i++)
+		{
+			if (amount[i]*period[i]>buf_length) //slightly better sound when it's '>' (deaf areas option) ('<' is trim option)
+				buf_length = amount[i]*period[i];
+		}
+    }
+    else
+    {
+    	//LCM found
+        for (int i = 0; i<tone_amount; i++)
+        {
+        	amount[i] = (uint8_t) (buf_length/period[i]);
+        }
+
     }
 
+    //now we have parameters to generate tones - types, their periods and amount of eriods generated
 
     uint8_t temp_buffer[MAX_DMA_LENGTH];
     uint8_t return_buffer[MAX_DMA_LENGTH];
 
+
     for (int i = 0; i<MAX_DMA_LENGTH; i++)
     {
-    	return_buffer[i] = 0;
-
+    	return_buffer[i] = 0;//this line is the important one, don't delete it
+    	temp_buffer[i] = 0;// in case of uncommenting that for loop with temp_buffer[i], comment out this
     }
 
+    //generating tones
     for (int i = 0; i<tone_amount; i++)
     {
-        for (int i = 0; i<MAX_DMA_LENGTH; i++)
+       /*this is commented out for a reason
+        * for (int i = 0; i<MAX_DMA_LENGTH; i++)
         {
         	temp_buffer[i] = 0;
 
-        }
+        }*/
     	switch (tone[i])
     		{
     		    case NONE:  generateNone(temp_buffer, amount[i], period[i]);break;
@@ -84,8 +115,8 @@ void updateMultipleTone(enum TONE tone[], double freq[])
     		    case NOISE: generateNoise(temp_buffer, amount[i], period[i]);break;
     		}
 
-
-    	 for (int j = 0; j<MAX_DMA_LENGTH; j++)
+         //summing signals
+    	 for (int j = 0; j<buf_length; j++)
     	    {
     	    	return_buffer[j] = return_buffer[j] + temp_buffer[j]/tone_amount;
     	    }
@@ -99,6 +130,7 @@ void updateMultipleTone(enum TONE tone[], double freq[])
 }
 
 ///@brief Plays tone composed of a single signal
+///Single tone API
 ///@param tone1 type of signal to play
 ///@param freq frequency of tone in Hz
 void updateSingleTone(enum TONE tone1, double freq)
@@ -290,9 +322,46 @@ void generateNone(uint8_t *buffer, uint16_t amount, uint16_t period)
 
 }
 
+///@brief generates Least Common Multiple of nums
+///@return LCM in case of success, 0 in case of failure
+///credit: https://www.programiz.com/c-programming/examples/lcm
+uint16_t LCM_generator(uint16_t nums[], uint8_t length)
+{
+	uint16_t max = nums[0];
+  for (int i = 1; i<length;i++)
+  {
+	  if (nums[i]>max)
+		  max = nums[i];
+  }
+
+  while(max<MAX_DMA_LENGTH)
+  {
+	  uint8_t flag = 1;
+	  for (int i = 0; i<length;i++)
+	  {
+		  if (!(max % nums[i]==0))
+		  {
+		    flag = 0;
+		    break;
+		  }
+	  }
+
+	  if (flag == 0)
+	  {
+		  max ++;
+	     continue;
+	  }
+	  else
+	  {
+		 return max;
+	  }
+  }
+  return (0);
+}
+
+
 ///@brief Generates additive white Gaussian Noise samples with zero mean and a standard deviation of 1.
-///credit: Cagri Tanriover
-///https://www.embeddedrelated.com/showcode/311.php
+///credit: Cagri Tanriover, https://www.embeddedrelated.com/showcode/311.php
 double AWGN_generator()
 {
   double temp1;

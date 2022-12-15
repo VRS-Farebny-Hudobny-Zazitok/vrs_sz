@@ -11,9 +11,8 @@
 #include <stdlib.h>
 
 
-//#define DMA_TIME_PERIOD 0.000250
 #define DMA_TIME_PERIOD 0.000125
-#define MAX_DMA_LENGTH 500
+#define MAX_DMA_LENGTH 480
 #define MAX_NUM_TONES 4
 
 enum TONE
@@ -46,5 +45,7 @@ void generateNoise(uint8_t *buffer, uint16_t amount, uint16_t period);
 void generateNone(uint8_t *buffer, uint16_t amount, uint16_t period);
 
 double AWGN_generator();
+
+uint16_t LCM_generator(uint16_t nums[], uint8_t length);
 
 #endif

@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "dac.h"
 #include "dma.h"
 #include "tim.h"
 #include "gpio.h"
@@ -28,6 +29,8 @@
 #include "ledlight.h"
 #include "colors.h"
 #include "musiclightdriver.h"
+#include "tone.h"
+#include "notes.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -48,9 +51,13 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t key_pressed;
-Color ledLight[NUMBER_OF_LEDS] = {0};
+uint8_t pressedKey;
+uint8_t flagKeyboard;
+uint8_t keyboardStatus[16] = {0};
 
+Color ledLight[NUMBER_OF_LEDS] = {0};
+uint8_t tones[] = {NONE,NONE,NONE,NONE};
+double freqs[] = {0,0,0,0};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -73,7 +80,6 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -96,22 +102,53 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_TIM1_Init();
-  MX_TIM2_Init();
+  MX_DAC1_Init();
+  MX_TIM3_Init();
+
   /* USER CODE BEGIN 2 */
-  HAL_TIM_Base_Start_IT(&htim2);
+
   initialLedReset(ledLight);
   setBrightness(5);
-  setMainToneColor(ledLight, GREEN);
-  setBeatColor(ledLight, GREEN);
-  setBackingTrackColor(ledLight, GREEN);
+  setMainToneColor(ledLight, RED);
+  setBeatColor(ledLight, RED);
+  setBackingTrackColor(ledLight, RED);
 
+  //
+  srand((unsigned) time(NULL));
+  initToneSystem();
   /* USER CODE END 2 */
 
   /* Infinite loop */
+
+  tones[0] = SQUARE;
+  tones[1] = SINE;
+
+  freqs[0] = E4;
+  freqs[1] = G4;
+  freqs[2] = G3;
+  freqs[3] = 0;
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    /* USER CODE END WHILE */
+//	sendLedData(ledLight);
+//	freqs[0] = E4;
+//	updateMultipleTone(tones,freqs);
+//	HAL_Delay(200);
+//	freqs[0] = F4;
+//	updateMultipleTone(tones,freqs);
+//	HAL_Delay(200);
+//	freqs[0] = G4;
+//	updateMultipleTone(tones,freqs);
+//	HAL_Delay(200);
+	KB_Detect_KeyPress();
+//	if (flagKeyboard){
+//		pressedKey = KB_Detect_KeyPress();
+//		setMainToneColor(ledLight, RED);
+//		setBeatColor(ledLight, RED);
+//		setBackingTrackColor(ledLight, RED);
+//		flagKeyboard = 0;
+//	}
+//    /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
   }

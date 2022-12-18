@@ -167,15 +167,15 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 
-  tones[0] = SQUARE;
-  tones[1] = SINE;
+ /* tones[0] = SINE;
+  tones[1] = SAW;
   tones[2] = NONE;
   tones[3] = NONE;
 
   freqs[0] = E4;
-  freqs[1] = G4;
-  freqs[2] = G3;
-  freqs[3] = 0;
+  freqs[1] = E3;
+  freqs[2] = 0;
+  freqs[3] = 0;*/
 
 
  /* updateSingleTone(NOISE, E4);
@@ -227,7 +227,11 @@ int main(void)
    updateMultipleTone(tones,freqs);
    HAL_Delay(200);
    }*/
- // freqs[0] = E4;
+  freqs[1] = E4;
+  tones[1] = SAW;
+
+  freqs[3] = A2;
+  tones[3] =SINE;
   updateMultipleTone(tones,freqs);
   //updateSingleTone(NONE, G2);
 
@@ -235,12 +239,17 @@ int main(void)
   while (1)
 	{
 
+	  /*updateSingleTone(SQUARE, C3);
+	  HAL_Delay(200);*/
+	 // updateSingleTone(SQUARE, G3);
+	 // HAL_Delay(200);
+
 	/*  freqs[0] = E4;
 	  updateMultipleTone(tones,freqs);
 	  HAL_Delay(200);
 	  freqs[0] = F4;
 	  updateMultipleTone(tones,freqs);
-	  HAL_Delay(200);
+
 	  freqs[0] = G4;
 	  updateMultipleTone(tones,freqs);
 	  HAL_Delay(200);*/

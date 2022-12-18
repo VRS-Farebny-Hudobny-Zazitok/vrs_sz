@@ -56,6 +56,7 @@ uint8_t flagKeyboard;
 uint8_t keyboardStatus[16] = {0};
 uint8_t octave = 3;
 
+float notes3[7] = {C3, D3, E3, F3, G3, A3, H3};
 float notes4[8] = {C4, D4, E4, F4, G4, A4, H4, C5};
 float notes5[8] = {C5, D5, E5, F5, G5, A5, H5, C6};
 
@@ -68,8 +69,8 @@ double freqs[] = {0,0,0,0};
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-uint8_t getPressed() {
-	for (uint8_t i=8; i<16; i++) {
+uint8_t isPressed() {
+	for (uint8_t i=1; i<16; i++) {
 		if (keyboardStatus[i]) {
 			return 1;
 		}
@@ -77,24 +78,29 @@ uint8_t getPressed() {
 	return 0;
 }
 
+
 void setOctave(uint8_t octave) {
-	uint8_t sum = getPressed();
+	uint8_t pressed = isPressed();
+
+	for (uint8_t i=1; i<8; i++) {
+		if (keyboardStatus[i]) {
+			updateSingleTone(SAW, notes3[i-1]);
+			setMainToneColor(ledLight, mainColors[i-1]);
+			setBeatColor(ledLight, mainColors[i-1]);
+			setBackingTrackColor(ledLight, mainColors[i-1]);
+			sendLedData(ledLight);
+
+		}
+	}
 
 	switch (octave) {
 		case 3:
 			for (uint8_t i=8; i<16; i++) {
 				if (keyboardStatus[i]) {
-					updateSingleTone(TRIANGLE, notes4[i-8]);
+					updateSingleTone(SINE, notes4[i-8]);
 					setMainToneColor(ledLight, mainColors[i-8]);
 					setBeatColor(ledLight, mainColors[i-8]);
 					setBackingTrackColor(ledLight, mainColors[i-8]);
-					sendLedData(ledLight);
-
-				} else if (sum == 0){
-					updateSingleTone(NONE, E4);
-					setMainToneColor(ledLight, OFF);
-					setBeatColor(ledLight, OFF);
-					setBackingTrackColor(ledLight, OFF);
 					sendLedData(ledLight);
 
 				}
@@ -109,16 +115,18 @@ void setOctave(uint8_t octave) {
 					setBackingTrackColor(ledLight, mainColors[i-8]);
 					sendLedData(ledLight);
 
-				} else if (sum == 0){
-					updateSingleTone(NONE, E4);
-					setMainToneColor(ledLight, OFF);
-					setBeatColor(ledLight, OFF);
-					setBackingTrackColor(ledLight, OFF);
-					sendLedData(ledLight);
-
 				}
 			}
 			break;
+
+	}
+
+	if (pressed == 0) {
+		updateSingleTone(NONE, E4);
+		setMainToneColor(ledLight, OFF);
+		setBeatColor(ledLight, OFF);
+		setBackingTrackColor(ledLight, OFF);
+		sendLedData(ledLight);
 
 	}
 }

@@ -54,7 +54,12 @@
 uint8_t pressedKey;
 uint8_t flagKeyboard;
 uint8_t keyboardStatus[16] = {0};
+uint8_t octave = 3;
 
+float notes4[8] = {C4, D4, E4, F4, G4, A4, H4, C5};
+float notes5[8] = {C5, D5, E5, F5, G5, A5, H5, C6};
+
+Color mainColors[8] = {RED, GREEN, BLUE, CYAN, MAGENTA, YELLOW, WHITE, RED};
 Color ledLight[NUMBER_OF_LEDS] = {0};
 uint8_t tones[] = {NONE,NONE,NONE,NONE};
 double freqs[] = {0,0,0,0};
@@ -63,7 +68,60 @@ double freqs[] = {0,0,0,0};
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+uint8_t getPressed() {
+	for (uint8_t i=8; i<16; i++) {
+		if (keyboardStatus[i]) {
+			return 1;
+		}
+	}
+	return 0;
+}
 
+void setOctave(uint8_t octave) {
+	uint8_t sum = getPressed();
+
+	switch (octave) {
+		case 3:
+			for (uint8_t i=8; i<16; i++) {
+				if (keyboardStatus[i]) {
+					updateSingleTone(TRIANGLE, notes4[i-8]);
+					setMainToneColor(ledLight, mainColors[i-8]);
+					setBeatColor(ledLight, mainColors[i-8]);
+					setBackingTrackColor(ledLight, mainColors[i-8]);
+					sendLedData(ledLight);
+
+				} else if (sum == 0){
+					updateSingleTone(NONE, E4);
+					setMainToneColor(ledLight, OFF);
+					setBeatColor(ledLight, OFF);
+					setBackingTrackColor(ledLight, OFF);
+					sendLedData(ledLight);
+
+				}
+			}
+			break;
+		case 4:
+			for (uint8_t i=8; i<16; i++) {
+				if (keyboardStatus[i]) {
+					updateSingleTone(SINE, notes5[i-8]);
+					setMainToneColor(ledLight, mainColors[i-8]);
+					setBeatColor(ledLight, mainColors[i-8]);
+					setBackingTrackColor(ledLight, mainColors[i-8]);
+					sendLedData(ledLight);
+
+				} else if (sum == 0){
+					updateSingleTone(NONE, E4);
+					setMainToneColor(ledLight, OFF);
+					setBeatColor(ledLight, OFF);
+					setBackingTrackColor(ledLight, OFF);
+					sendLedData(ledLight);
+
+				}
+			}
+			break;
+
+	}
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -106,11 +164,8 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
-  initialLedReset(ledLight);
-  setBrightness(5);
-  setMainToneColor(ledLight, RED);
-  setBeatColor(ledLight, RED);
-  setBackingTrackColor(ledLight, RED);
+  //initialLedReset(ledLight);
+  //setBrightness(45);
 
   //
   srand((unsigned) time(NULL));
@@ -121,27 +176,21 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-//	sendLedData(ledLight);
-//	freqs[0] = E4;
-//	updateMultipleTone(tones,freqs);
-//	HAL_Delay(200);
-//	freqs[0] = F4;
-//	updateMultipleTone(tones,freqs);
-//	HAL_Delay(200);
-//	freqs[0] = G4;
-//	updateMultipleTone(tones,freqs);
-//	HAL_Delay(200);
 	KB_Detect_KeyPress();
-//	if (flagKeyboard){
-//		pressedKey = KB_Detect_KeyPress();
-//		setMainToneColor(ledLight, RED);
-//		setBeatColor(ledLight, RED);
-//		setBackingTrackColor(ledLight, RED);
-//		flagKeyboard = 0;
-//	}
+	HAL_Delay(100);
+	if (keyboardStatus[0]) {
+		octave = 4;
+		setOctave(octave);
+
+	} else {
+		octave = 3;
+		setOctave(octave);
+	}
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
   }
   /* USER CODE END 3 */
 }

@@ -94,7 +94,7 @@ void HAL_DAC_MspInit(DAC_HandleTypeDef* dacHandle)
     hdma_dac1_ch1.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
     hdma_dac1_ch1.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
     hdma_dac1_ch1.Init.Mode = DMA_CIRCULAR;
-    hdma_dac1_ch1.Init.Priority = DMA_PRIORITY_LOW;
+    hdma_dac1_ch1.Init.Priority = DMA_PRIORITY_VERY_HIGH;
     if (HAL_DMA_Init(&hdma_dac1_ch1) != HAL_OK)
     {
       Error_Handler();

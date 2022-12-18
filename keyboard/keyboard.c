@@ -5,7 +5,7 @@ uint8_t lPressedKey = 0;
 uint32_t rowGpioPort[NUMBER_OF_ROWS] = {R0_GPIO_Port, R1_GPIO_Port, R2_GPIO_Port, R3_GPIO_Port};
 uint32_t rowPin[NUMBER_OF_ROWS] = {R0_Pin, R1_Pin, R2_Pin, R3_Pin};
 
-uint8_t detect_column(uint8_t column_number)
+void detect_column(uint8_t column_number)
 {
 
 	resetKeyboardColumns();
@@ -53,12 +53,12 @@ void resetKeyboardColumns(){
 	HAL_GPIO_WritePin(C3_GPIO_Port, C3_Pin, GPIO_PIN_RESET);
 }
 
-uint8_t KB_Detect_KeyPress(void)
+void KB_Detect_KeyPress(void)
 {
 	uint8_t key_press = 0;
 	for(uint8_t col = 0; col < 4; col++)
 	{
-		key_press = detect_column(col);
+		detect_column(col);
 	}
 
 	return lPressedKey;

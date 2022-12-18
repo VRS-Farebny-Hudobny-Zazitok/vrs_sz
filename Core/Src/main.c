@@ -104,7 +104,6 @@ int main(void)
   MX_TIM1_Init();
   MX_DAC1_Init();
   MX_TIM3_Init();
-
   /* USER CODE BEGIN 2 */
 
   initialLedReset(ledLight);
@@ -119,14 +118,6 @@ int main(void)
   /* USER CODE END 2 */
 
   /* Infinite loop */
-
-  tones[0] = SQUARE;
-  tones[1] = SINE;
-
-  freqs[0] = E4;
-  freqs[1] = G4;
-  freqs[2] = G3;
-  freqs[3] = 0;
   /* USER CODE BEGIN WHILE */
   while (1)
   {
@@ -148,7 +139,7 @@ int main(void)
 //		setBackingTrackColor(ledLight, RED);
 //		flagKeyboard = 0;
 //	}
-//    /* USER CODE END WHILE */
+    /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
   }

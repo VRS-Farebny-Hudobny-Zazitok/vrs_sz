@@ -53,6 +53,7 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
+extern uint8_t flagKeyboard;
 
 /* USER CODE END EFP */
 

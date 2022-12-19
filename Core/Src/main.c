@@ -18,12 +18,20 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "dac.h"
+#include "dma.h"
+#include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "keyboard.h"
-
+#include "ledlight.h"
+#include "colors.h"
+#include "musiclightdriver.h"
+#include "tone.h"
+#include "notes.h"
+#include "time.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -44,17 +52,108 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint8_t key_pressed;
+uint8_t pressedKey;
+uint8_t flagKeyboard;
+uint8_t keyboardStatus[16] = {0};
+uint8_t octave = 3;
+
+Color ledLight[NUMBER_OF_LEDS] = {0};
+uint8_t tones[] = {NONE,NONE,NONE,NONE};
+double freqs[] = {0,0,0,0};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+uint8_t isPressed(uint8_t startIndex, uint8_t endIndex) {
+	for (uint8_t i=startIndex; i<endIndex; i++) {
+		if (keyboardStatus[i]) {
+			return 1;
+		}
+	}
+	return 0;
+}
 
+void resetTonesAndFreqs() {
+	for (int i=0; i<MAX_NUM_TONES; i++) {
+		tones[i] = NONE;
+		freqs[i] = 0;
+	}
+
+}
+
+uint8_t processOctave(uint8_t octave) {
+	uint8_t lowerOctave = isPressed(1, 8);
+	uint8_t upperOctave = isPressed(8, 16);
+	uint8_t pressed = lowerOctave + upperOctave;
+
+	if (lowerOctave) {
+		for (uint8_t i=1; i<8; i++) {
+			if (keyboardStatus[i]) {
+				tones[0] = SAW;
+				freqs[0] = notes3[i-1];
+				setMainToneColor(ledLight, mainColors[7-i]);
+				setBeatColor(ledLight, mainColors[i-1]);
+				setBackingTrackColor(ledLight, mainColors[i]);
+			}
+		}
+	} else {
+		tones[0] = NONE;
+		freqs[0] = 0;
+	}
+
+	if (upperOctave) {
+		switch (octave) {
+			case 4:
+				for (uint8_t i=8; i<16; i++) {
+					if (keyboardStatus[i]) {
+						tones[1] = SINE;
+						freqs[1] = notes4[i-8];
+						setMainToneColor(ledLight, mainColors[i-8]);
+						setBeatColor(ledLight, mainColors[i]);
+						setBackingTrackColor(ledLight, mainColors[8-i]);
+					}
+				}
+				break;
+			case 5:
+				for (uint8_t i=8; i<16; i++) {
+					if (keyboardStatus[i]) {
+						tones[1] = SINE;
+						freqs[1] = notes5[i-8];
+						setMainToneColor(ledLight, mainColors[i-8]);
+						setBeatColor(ledLight, mainColors[i]);
+						setBackingTrackColor(ledLight, mainColors[8-i]);
+					}
+				}
+				break;
+		}
+	} else {
+		tones[1] = NONE;
+		freqs[1] = 0;
+	}
+
+
+	return pressed;
+}
+
+void setOctave(uint8_t octave) {
+	uint8_t pressed = processOctave(octave);
+
+	if (pressed == 0) {
+		setMainToneColor(ledLight, OFF);
+		setBeatColor(ledLight, OFF);
+		setBackingTrackColor(ledLight, OFF);
+	}
+	sendLedData(ledLight);
+	updateMultipleTone(tones, freqs);
+
+}
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+
 
 /* USER CODE END 0 */
 
@@ -65,7 +164,6 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -86,17 +184,39 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
+  MX_TIM1_Init();
+  MX_DAC1_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
+  //initialLedReset(ledLight);
+  //setBrightness(45);
+
+  //
+  srand((unsigned) time(NULL));
+  initToneSystem();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+	KB_Detect_KeyPress();
+	if (keyboardStatus[0]) {
+		octave = 5;
+		setOctave(octave);
+
+	} else {
+		octave = 4;
+		setOctave(octave);
+	}
+	HAL_Delay(5);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
   }
   /* USER CODE END 3 */
 }
@@ -109,6 +229,7 @@ void SystemClock_Config(void)
 {
   RCC_OscInitTypeDef RCC_OscInitStruct = {0};
   RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
+  RCC_PeriphCLKInitTypeDef PeriphClkInit = {0};
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
@@ -116,7 +237,9 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL16;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -126,12 +249,18 @@ void SystemClock_Config(void)
   */
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
                               |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
+  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
+  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
   RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
+  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_TIM1;
+  PeriphClkInit.Tim1ClockSelection = RCC_TIM1CLK_HCLK;
+  if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
     Error_Handler();
   }

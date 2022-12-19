@@ -66,27 +66,18 @@ double freqs[] = {0,0,0,0};
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-uint8_t isChanged()
-{
+uint8_t didChange() {
 	int flag = 0;
-for (int i = 0; i<16;i++)
-{
-  if (keyboardStatus[i]!=keyboardStatus_old[i])
-	  flag = 1;
-}
-
-if (flag == 0)
-	return 0;
-else
-{
-	for (int i = 0; i<16;i++)
-	{
-	  keyboardStatus_old[i]=keyboardStatus[i];
-
+	for (int i = 0; i<16;i++) {
+		if (keyboardStatus[i]!=keyboardStatus_old[i]) {
+			flag = 1;
+			keyboardStatus_old[i]=keyboardStatus[i];
+		}
 	}
-	return 1;
-}
-
+	if (flag)
+		return 1;
+	else
+		return 0;
 }
 
 uint8_t isPressed(uint8_t startIndex, uint8_t endIndex) {
@@ -228,16 +219,16 @@ int main(void)
   {
 	KB_Detect_KeyPress();
 
-    if (isChanged()==1)
+    if (didChange())
     {
-	if (keyboardStatus[0]) {
-		octave = 5;
-		setOctave(octave);
+		if (keyboardStatus[0]) {
+			octave = 5;
+			setOctave(octave);
 
-	} else {
-		octave = 4;
-		setOctave(octave);
-	}
+		} else {
+			octave = 4;
+			setOctave(octave);
+		}
     }
 
 	HAL_Delay(50);

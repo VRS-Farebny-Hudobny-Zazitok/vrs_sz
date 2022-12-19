@@ -219,8 +219,7 @@ int main(void)
   {
 	KB_Detect_KeyPress();
 
-    if (didChange())
-    {
+    if (didChange()) {
 		if (keyboardStatus[0]) {
 			octave = 5;
 			setOctave(octave);
@@ -230,9 +229,6 @@ int main(void)
 			setOctave(octave);
 		}
     }
-
-	HAL_Delay(50);
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

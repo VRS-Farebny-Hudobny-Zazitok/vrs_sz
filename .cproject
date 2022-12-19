@@ -51,6 +51,7 @@
 									<listOptionValue builtIn="false" value="../Drivers/STM32F3xx_HAL_Driver/Inc/Legacy"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/vrs_sz/keyboard}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/vrs_sz/LedLight}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/vrs_sz/Music}&quot;"/>
 								</option>
 								<inputType id="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c.1356637103" superClass="com.st.stm32cube.ide.mcu.gnu.managedbuild.tool.c.compiler.input.c"/>
 							</tool>
@@ -78,10 +79,11 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="LedLight"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="keyboard"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="LedLight"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Music"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="keyboard"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -157,6 +159,7 @@
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Core"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Drivers"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="Music"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

@@ -89,12 +89,48 @@ uint8_t isPressed(uint8_t startIndex, uint8_t endIndex) {
 	return 0;
 }
 
-void resetTonesAndFreqs() {
-	for (int i=0; i<MAX_NUM_TONES; i++) {
-		tones[i] = NONE;
-		freqs[i] = 0;
-	}
+void resetTonesAndFreqs(uint8_t index) {
+	tones[index] = NONE;
+	freqs[index] = 0;
+}
 
+void playLowerOctave() {
+	for (uint8_t i=1; i<8; i++) {
+		if (keyboardStatus[i]) {
+			tones[0] =SQUARE;
+			freqs[0] = notes3[i-1];
+			setMainToneColor(ledLight, mainColors[7-i]);
+			setBeatColor(ledLight, mainColors[i-1]);
+			setBackingTrackColor(ledLight, mainColors[i]);
+		}
+	}
+}
+
+void playUpperOctave(uint8_t octave) {
+	switch (octave) {
+		case 4:
+			for (uint8_t i=8; i<16; i++) {
+				if (keyboardStatus[i]) {
+					tones[1] = SINE;
+					freqs[1] = notes4[i-8];
+					setMainToneColor(ledLight, mainColors[i-8]);
+					setBeatColor(ledLight, mainColors[i]);
+					setBackingTrackColor(ledLight, mainColors[8-i]);
+				}
+			}
+			break;
+		case 5:
+			for (uint8_t i=8; i<16; i++) {
+				if (keyboardStatus[i]) {
+					tones[1] = SINE;
+					freqs[1] = notes5[i-8];
+					setMainToneColor(ledLight, mainColors[i-8]);
+					setBeatColor(ledLight, mainColors[i]);
+					setBackingTrackColor(ledLight, mainColors[8-i]);
+				}
+			}
+			break;
+	}
 }
 
 uint8_t processOctave(uint8_t octave) {
@@ -103,50 +139,16 @@ uint8_t processOctave(uint8_t octave) {
 	uint8_t pressed = lowerOctave + upperOctave;
 
 	if (lowerOctave) {
-		for (uint8_t i=1; i<8; i++) {
-			if (keyboardStatus[i]) {
-				tones[0] =SQUARE;
-				freqs[0] = notes3[i-1];
-				setMainToneColor(ledLight, mainColors[7-i]);
-				setBeatColor(ledLight, mainColors[i-1]);
-				setBackingTrackColor(ledLight, mainColors[i]);
-			}
-		}
+		playLowerOctave();
 	} else {
-		tones[0] = NONE;
-		freqs[0] = 0;
+		resetTonesAndFreqs(0);
 	}
 
 	if (upperOctave) {
-		switch (octave) {
-			case 4:
-				for (uint8_t i=8; i<16; i++) {
-					if (keyboardStatus[i]) {
-						tones[1] = SINE;
-						freqs[1] = notes4[i-8];
-						setMainToneColor(ledLight, mainColors[i-8]);
-						setBeatColor(ledLight, mainColors[i]);
-						setBackingTrackColor(ledLight, mainColors[8-i]);
-					}
-				}
-				break;
-			case 5:
-				for (uint8_t i=8; i<16; i++) {
-					if (keyboardStatus[i]) {
-						tones[1] = SINE;
-						freqs[1] = notes5[i-8];
-						setMainToneColor(ledLight, mainColors[i-8]);
-						setBeatColor(ledLight, mainColors[i]);
-						setBackingTrackColor(ledLight, mainColors[8-i]);
-					}
-				}
-				break;
-		}
+		playUpperOctave(octave);
 	} else {
-		tones[1] = NONE;
-		freqs[1] = 0;
+		resetTonesAndFreqs(1);
 	}
-
 
 	return pressed;
 }
@@ -161,7 +163,6 @@ void setOctave(uint8_t octave) {
 	}
 	sendLedData(ledLight);
 	updateMultipleTone(tones, freqs);
-
 }
 /* USER CODE END PFP */
 

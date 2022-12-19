@@ -59,4 +59,7 @@
 #define H5		987.77f
 #define C6		1046.50f
 
+static const float notes3[7] = {C3, D3, E3, F3, G3, A3, H3};
+static const float notes4[8] = {C4, D4, E4, F4, G4, A4, H4, C5};
+static const float notes5[8] = {C5, D5, E5, F5, G5, A5, H5, C6};
 #endif /* NOTES_H_ */

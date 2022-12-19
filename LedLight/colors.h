@@ -17,8 +17,9 @@ static const Color MAGENTA = {255, 0, 255};
 static const Color CYAN = {0, 255, 255};
 static const Color YELLOW = {255, 255, 0};
 static const Color WHITE = {255, 255, 255};
+static const Color RANDOM = {99, 99, 163};
 static const Color OFF = {0, 0, 0};
 
 static const Color colorIterator[] = {RED, GREEN, BLUE, MAGENTA, CYAN, YELLOW};
-
+static const Color mainColors[8] = {RED, GREEN, BLUE, CYAN, MAGENTA, YELLOW, WHITE, RANDOM};
 #endif /* COLORS_H_ */

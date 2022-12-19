@@ -25,12 +25,11 @@ uint16_t freqToPeriod(double freq)
 /// Multi tone API
 ///@param tone[] Array of TONE with the length of 4,
 /// Can have from 0 to 4 tones.
-/// Array starts with tones that are other than NONE, the rest (unused channels) are NONE
 /// If all are NONE, then the function call single tone API with NONE parameter
 ///@param freq[] Array of tone frequencies corresponding to tone[].
 /// Must have the same length as tone[]
 /// values corresponding to NONE tones are ignored
-void updateMultipleTone(enum TONE tone[], double freq[])
+void updateMultipleTone(enum TONE tone1[], double freq1[])
 {
 
     uint8_t tone_amount = 0;
@@ -38,7 +37,7 @@ void updateMultipleTone(enum TONE tone[], double freq[])
     //determine amount of non-NONE tones
     for (int i = 0; i<MAX_NUM_TONES; i++)
     {
-    	if (tone[i]!=NONE)
+    	if (tone1[i]!=NONE)
     	    	tone_amount++;
     }
 
@@ -47,6 +46,20 @@ void updateMultipleTone(enum TONE tone[], double freq[])
     {
     	updateSingleTone(NONE,440);
         return;
+    }
+
+    //sorting, making sure that all NONE tones are last
+    enum TONE tone[] = {NONE,NONE,NONE,NONE};
+    double freq[] = {0,0,0,0};
+
+    for (int i = 0,j = 0; i<4;i++)
+    {
+    	if (tone1[i]!=NONE)
+    	{
+    		tone[j]=tone1[i];
+    		freq[j] = freq1[i];
+    		j++;
+    	}
     }
 
 
@@ -84,7 +97,7 @@ void updateMultipleTone(enum TONE tone[], double freq[])
 
     }
 
-    //now we have parameters to generate tones - types, their periods and amount of eriods generated
+    //now we have parameters to generate tones - types, their periods and amount of periods generated
 
     uint8_t temp_buffer[MAX_DMA_LENGTH];
     uint8_t return_buffer[MAX_DMA_LENGTH];

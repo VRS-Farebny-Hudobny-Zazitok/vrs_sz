@@ -31,6 +31,7 @@
 #include "musiclightdriver.h"
 #include "tone.h"
 #include "notes.h"
+#include "time.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -56,11 +57,6 @@ uint8_t flagKeyboard;
 uint8_t keyboardStatus[16] = {0};
 uint8_t octave = 3;
 
-float notes3[7] = {C3, D3, E3, F3, G3, A3, H3};
-float notes4[8] = {C4, D4, E4, F4, G4, A4, H4, C5};
-float notes5[8] = {C5, D5, E5, F5, G5, A5, H5, C6};
-
-Color mainColors[8] = {RED, GREEN, BLUE, CYAN, MAGENTA, YELLOW, WHITE, RED};
 Color ledLight[NUMBER_OF_LEDS] = {0};
 uint8_t tones[] = {NONE,NONE,NONE,NONE};
 double freqs[] = {0,0,0,0};
@@ -69,8 +65,8 @@ double freqs[] = {0,0,0,0};
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-uint8_t isPressed() {
-	for (uint8_t i=1; i<16; i++) {
+uint8_t isPressed(uint8_t startIndex, uint8_t endIndex) {
+	for (uint8_t i=startIndex; i<endIndex; i++) {
 		if (keyboardStatus[i]) {
 			return 1;
 		}
@@ -78,57 +74,79 @@ uint8_t isPressed() {
 	return 0;
 }
 
+void resetTonesAndFreqs() {
+	for (int i=0; i<MAX_NUM_TONES; i++) {
+		tones[i] = NONE;
+		freqs[i] = 0;
+	}
+
+}
+
+uint8_t processOctave(uint8_t octave) {
+	uint8_t lowerOctave = isPressed(1, 8);
+	uint8_t upperOctave = isPressed(8, 16);
+	uint8_t pressed = lowerOctave + upperOctave;
+
+	if (lowerOctave) {
+		for (uint8_t i=1; i<8; i++) {
+			if (keyboardStatus[i]) {
+				tones[0] = SAW;
+				freqs[0] = notes3[i-1];
+				setMainToneColor(ledLight, mainColors[7-i]);
+				setBeatColor(ledLight, mainColors[i-1]);
+				setBackingTrackColor(ledLight, mainColors[i]);
+			}
+		}
+	} else {
+		tones[0] = NONE;
+		freqs[0] = 0;
+	}
+
+	if (upperOctave) {
+		switch (octave) {
+			case 4:
+				for (uint8_t i=8; i<16; i++) {
+					if (keyboardStatus[i]) {
+						tones[1] = SINE;
+						freqs[1] = notes4[i-8];
+						setMainToneColor(ledLight, mainColors[i-8]);
+						setBeatColor(ledLight, mainColors[i]);
+						setBackingTrackColor(ledLight, mainColors[8-i]);
+					}
+				}
+				break;
+			case 5:
+				for (uint8_t i=8; i<16; i++) {
+					if (keyboardStatus[i]) {
+						tones[1] = SINE;
+						freqs[1] = notes5[i-8];
+						setMainToneColor(ledLight, mainColors[i-8]);
+						setBeatColor(ledLight, mainColors[i]);
+						setBackingTrackColor(ledLight, mainColors[8-i]);
+					}
+				}
+				break;
+		}
+	} else {
+		tones[1] = NONE;
+		freqs[1] = 0;
+	}
+
+
+	return pressed;
+}
 
 void setOctave(uint8_t octave) {
-	uint8_t pressed = isPressed();
-
-	for (uint8_t i=1; i<8; i++) {
-		if (keyboardStatus[i]) {
-			updateSingleTone(SAW, notes3[i-1]);
-			setMainToneColor(ledLight, mainColors[i-1]);
-			setBeatColor(ledLight, mainColors[i-1]);
-			setBackingTrackColor(ledLight, mainColors[i-1]);
-			sendLedData(ledLight);
-
-		}
-	}
-
-	switch (octave) {
-		case 3:
-			for (uint8_t i=8; i<16; i++) {
-				if (keyboardStatus[i]) {
-					updateSingleTone(SINE, notes4[i-8]);
-					setMainToneColor(ledLight, mainColors[i-8]);
-					setBeatColor(ledLight, mainColors[i-8]);
-					setBackingTrackColor(ledLight, mainColors[i-8]);
-					sendLedData(ledLight);
-
-				}
-			}
-			break;
-		case 4:
-			for (uint8_t i=8; i<16; i++) {
-				if (keyboardStatus[i]) {
-					updateSingleTone(SINE, notes5[i-8]);
-					setMainToneColor(ledLight, mainColors[i-8]);
-					setBeatColor(ledLight, mainColors[i-8]);
-					setBackingTrackColor(ledLight, mainColors[i-8]);
-					sendLedData(ledLight);
-
-				}
-			}
-			break;
-
-	}
+	uint8_t pressed = processOctave(octave);
 
 	if (pressed == 0) {
-		updateSingleTone(NONE, E4);
 		setMainToneColor(ledLight, OFF);
 		setBeatColor(ledLight, OFF);
 		setBackingTrackColor(ledLight, OFF);
-		sendLedData(ledLight);
-
 	}
+	sendLedData(ledLight);
+	updateMultipleTone(tones, freqs);
+
 }
 /* USER CODE END PFP */
 
@@ -185,15 +203,15 @@ int main(void)
   while (1)
   {
 	KB_Detect_KeyPress();
-	HAL_Delay(100);
 	if (keyboardStatus[0]) {
-		octave = 4;
+		octave = 5;
 		setOctave(octave);
 
 	} else {
-		octave = 3;
+		octave = 4;
 		setOctave(octave);
 	}
+	HAL_Delay(5);
 
     /* USER CODE END WHILE */
 

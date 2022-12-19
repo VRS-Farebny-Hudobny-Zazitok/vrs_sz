@@ -55,6 +55,7 @@
 uint8_t pressedKey;
 uint8_t flagKeyboard;
 uint8_t keyboardStatus[16] = {0};
+uint8_t keyboardStatus_old[16] = {0};
 uint8_t octave = 3;
 
 Color ledLight[NUMBER_OF_LEDS] = {0};
@@ -65,6 +66,29 @@ double freqs[] = {0,0,0,0};
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+uint8_t isChanged()
+{
+	int flag = 0;
+for (int i = 0; i<16;i++)
+{
+  if (keyboardStatus[i]!=keyboardStatus_old[i])
+	  flag = 1;
+}
+
+if (flag == 0)
+	return 0;
+else
+{
+	for (int i = 0; i<16;i++)
+	{
+	  keyboardStatus_old[i]=keyboardStatus[i];
+
+	}
+	return 1;
+}
+
+}
+
 uint8_t isPressed(uint8_t startIndex, uint8_t endIndex) {
 	for (uint8_t i=startIndex; i<endIndex; i++) {
 		if (keyboardStatus[i]) {
@@ -90,7 +114,7 @@ uint8_t processOctave(uint8_t octave) {
 	if (lowerOctave) {
 		for (uint8_t i=1; i<8; i++) {
 			if (keyboardStatus[i]) {
-				tones[0] = SAW;
+				tones[0] =SQUARE;
 				freqs[0] = notes3[i-1];
 				setMainToneColor(ledLight, mainColors[7-i]);
 				setBeatColor(ledLight, mainColors[i-1]);
@@ -203,6 +227,9 @@ int main(void)
   while (1)
   {
 	KB_Detect_KeyPress();
+
+    if (isChanged()==1)
+    {
 	if (keyboardStatus[0]) {
 		octave = 5;
 		setOctave(octave);
@@ -211,7 +238,9 @@ int main(void)
 		octave = 4;
 		setOctave(octave);
 	}
-	HAL_Delay(5);
+    }
+
+	HAL_Delay(50);
 
     /* USER CODE END WHILE */
 

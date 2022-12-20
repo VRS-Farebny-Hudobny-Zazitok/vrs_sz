@@ -10,8 +10,8 @@ Podľa zahraného tónu bude taktiež svietiť 8-segmentové svetlo príšlušno
 
 ---
 ### Úlohy
-- Vytvorenie projektu a základná konfigurácia (GPIO, DMA, TIMERs, ...)
-- Vytvorenie obslužného kódu pre klávesnicu
-- Vytvorenie databázy tónov a farieb
-- Implementácia generovania signálov pomocou timer-ov
-- Vytvorenie obslužného kódu pre 8-segmentové svetlo
+- ☑ Vytvorenie projektu a základná konfigurácia (GPIO, DMA, TIMERs, ...) 
+- ☑ Vytvorenie obslužného kódu pre klávesnicu
+- ☑ Vytvorenie databázy tónov a farieb
+- ☑ Implementácia generovania signálov pomocou timer-ov
+- ☑ Vytvorenie obslužného kódu pre 8-segmentové svetlo

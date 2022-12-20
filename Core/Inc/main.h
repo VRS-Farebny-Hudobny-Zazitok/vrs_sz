@@ -53,6 +53,15 @@ extern "C" {
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
+void playUpperOctave(uint8_t octave);
+void playLowerOctave();
+void resetTonesAndFreqs(uint8_t index);
+void setOctave(uint8_t octave);
+
+uint8_t isPressed(uint8_t startIndex, uint8_t endIndex);
+uint8_t didChange();
+uint8_t processOctave(uint8_t octave);
+
 extern uint8_t flagKeyboard;
 
 /* USER CODE END EFP */

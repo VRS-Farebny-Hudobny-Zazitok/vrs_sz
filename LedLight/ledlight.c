@@ -4,6 +4,7 @@
 #include "tim.h"
 #include "dma.h"
 #include "colors.h"
+#include "musiclightdriver.h"
 
 // Header implementation
 uint16_t pwm[(24 * NUMBER_OF_LEDS) + 50]; //24*8 + 50 is a reset sequence 2/3 LOW 800 kHz 1 perioda => 1/800000 => 1.25 ms datasheet

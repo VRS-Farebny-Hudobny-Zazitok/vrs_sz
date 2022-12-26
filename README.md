@@ -15,3 +15,19 @@ Podľa zahraného tónu bude taktiež svietiť 8-segmentové svetlo príšlušno
 - ☑ Vytvorenie databázy tónov a farieb
 - ☑ Implementácia generovania signálov pomocou timer-ov
 - ☑ Vytvorenie obslužného kódu pre 8-segmentové svetlo
+
+---
+#### Zapojenie
+<b>Klávesnica</b>\
+C3 - PB0\
+C2 - PB7\
+C1 - PB6\
+C0 - PB1\
+R0 - PA8\
+R1 - PA11\
+R2 - PB5\
+R3 - PB4\
+<b>Reproduktor</b>\
+PA4\
+<b>Svetlo</b>\
+PA10

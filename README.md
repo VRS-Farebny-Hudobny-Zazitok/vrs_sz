@@ -31,3 +31,6 @@ R3 - PB4\
 PA4\
 <b>Svetlo</b>\
 PA10
+---
+### Schéma zapojenia
+![Schéma zapojenia](/diagram.png)
